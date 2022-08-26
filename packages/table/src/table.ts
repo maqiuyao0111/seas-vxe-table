@@ -11,6 +11,7 @@ import GlobalConfig from '../../v-x-e-table/src/conf'
 import Cell from './cell'
 import TableBodyComponent from './body'
 import TableHeaderComponent from '../../header'
+import TableFooterComponent from '../../footer'
 import tableProps from './props'
 import tableEmits from './emits'
 import VxeLoading from '../../loading/index'
@@ -2621,7 +2622,7 @@ export default defineComponent({
       createData (records) {
         const { treeConfig } = props
         const treeOpts = computeTreeOpts.value
-        const handleRrecord = (record: any) => reactive(tablePrivateMethods.defineField(Object.assign({}, record)))
+        const handleRrecord = (record: any) => reactive(tablePrivateMethods.defineField(record || {}))
         const rows = treeConfig ? XEUtils.mapTree(records, handleRrecord, treeOpts) : records.map(handleRrecord)
         return nextTick().then(() => rows)
       },
@@ -4582,7 +4583,7 @@ export default defineComponent({
         const rowkey = getRowkey($xetable)
         internalData.tableFullColumn.forEach(column => {
           const { field, editRender } = column
-          if (field && !XEUtils.has(record, field)) {
+          if (field && !XEUtils.has(record, field) && !record[field]) {
             let cellValue = null
             if (editRender) {
               const { defaultValue } = editRender
@@ -5602,7 +5603,7 @@ export default defineComponent({
           tableColumn,
           fixedColumn
         }),
-        showFooter ? h(resolveComponent('vxe-table-footer') as ComponentOptions, {
+        showFooter ? h(TableFooterComponent, {
           ref: isFixedLeft ? refTableLeftFooter : refTableRightFooter,
           footerTableData,
           tableColumn,
@@ -6002,7 +6003,7 @@ export default defineComponent({
             /**
              * 表尾
              */
-            showFooter ? h(resolveComponent('vxe-table-footer') as ComponentOptions, {
+            showFooter ? h(TableFooterComponent, {
               ref: refTableFooter,
               footerTableData,
               tableColumn
